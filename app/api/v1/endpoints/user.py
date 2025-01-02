@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
 
 from app.schemas.user import UserCreate, UserResponse
+from app.services.user_service import create_user
 
 
 router = APIRouter()
 
-@router.post("/users/", response_model=UserResponse)
-def create_new_user(user: UserCreate):
-    # TODO: Create a new user in the database using the service layer
-    return {"name": user.name, "email": user.email, "password": user.password, "id": 1, "is_active": True}
+@router.post("/create", response_model=UserResponse)
+async def create_new_user(user: UserCreate):
+    user_data = await create_user(user)
+    return user_data

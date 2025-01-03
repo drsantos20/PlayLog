@@ -170,5 +170,8 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-#Ignore all .db files
+# Ignore all .db files
 *.db
+
+# Ignore alembic migrations
+alembic/versions

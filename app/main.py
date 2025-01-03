@@ -1,15 +1,30 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+from sqlalchemy import create_engine
+
 from app.api.v1.endpoints import user
-from app.db.database import create_tables
+from app.db.database import sessionmanager
 
-app = FastAPI(title="FastAPI with SQLAlchemy")
-
-# Include routes
-app.include_router(user.router, prefix="/api/v1/users", tags=["users"])
+DATABASE_URL = "sqlite+aiosqlite:///./playlog.db"
+engine = create_engine(DATABASE_URL, echo=True)
 
 
-async def on_startup():
-    create_tables()
-
-
-app.add_event_handler("startup", on_startup)
+def init_app(init_db: bool = True):
+    lifespan = None
+    
+    if init_db:
+        sessionmanager.init(host=DATABASE_URL)
+        
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            yield
+            if sessionmanager._engine is not None:
+                await sessionmanager.close()
+                
+                
+    server = FastAPI(title="FastAPI with SQLAlchemy", lifespan=lifespan)
+    
+    server.include_router(user.router, prefix="/api/v1/users", tags=["users"])
+        
+    return server

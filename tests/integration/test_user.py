@@ -1,26 +1,12 @@
 
 
-from fastapi.testclient import TestClient
-from app.db.models.user import User
-from app.main import app
-
-client = TestClient(app)
-
-def test_create_user(db_session):
+def test_create_user(client):
     
     user_data = {
         "username": "testuser",
         "email": "test@example.com",
         "password": "testpassword"
     }
-    
-    new_user = User(
-        username=user_data["username"],
-        email=user_data["email"],
-        hashed_password=user_data["password"]  # In real use, hash the password
-    )
-    db_session.add(new_user)
-    db_session.commit()
     
     response = client.post("/api/v1/users/create", json=user_data)
     

@@ -13,5 +13,6 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     id: int
     is_active: bool
+    email: str
     
     model_config = ConfigDict(str_max_length=50)

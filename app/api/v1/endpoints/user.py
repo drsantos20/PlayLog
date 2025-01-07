@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_db
@@ -13,7 +13,9 @@ async def create_new_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     return user_data
 
 
-@router.get("/user", response_model=UserResponse)
+@router.get("/user/{username}", response_model=UserResponse)
 async def get_user_by_username(username: str, db: AsyncSession = Depends(get_db)):
     user = await get_user(username, db)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
     return user

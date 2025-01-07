@@ -21,5 +21,5 @@ async def get_user(username: str, db: AsyncSession):
     find_user = await db.execute(
         select(User).where(User.username == username)
     )
-    user = find_user.scalars().first()
-    return user
+    fetched_user = find_user.scalars().first()
+    return fetched_user

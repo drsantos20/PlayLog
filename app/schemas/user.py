@@ -8,6 +8,10 @@ class UserBase(BaseModel):
     
 class UserCreate(UserBase):
     password: str
+    
+
+class UserUpdate(BaseModel):
+    password: str
 
 
 class UserResponse(UserBase):

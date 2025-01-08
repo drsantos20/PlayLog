@@ -1,7 +1,7 @@
 
 
 from app.schemas.user import UserCreate
-from app.services.user_service import create_user
+from app.services.user_service import create_user, get_user
 
 
 def test_create_user(client):
@@ -47,3 +47,26 @@ async def test_not_found_user(client):
 
     assert response.status_code == 404
     assert response.json() == {'detail': 'User not found'}
+
+
+async def test_update_user(client, db_session):
+    user = UserCreate(
+        username="usertoupdate",
+        email="usertoupdate@example.com",
+        password="testpassword"
+    )
+
+    await create_user(user, db_session)
+
+    user_data = {
+        "password": "updatepassword"
+    }
+
+    response = client.put(f"/api/v1/users/update/{user.username}", json=user_data)
+
+    assert response.status_code == 200
+    
+    updated_user = await get_user(user.username, db_session)
+    
+    assert updated_user.hashed_password != user.password
+    assert updated_user.hashed_password == user_data["password"]
